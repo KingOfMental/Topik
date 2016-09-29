@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private Button B1;
     private Mylistner li;
 
-    public static final String PACKAGE_DIR = "/data/data/com.example.hun10.topik_test";
+    public static final String PACKAGE_DIR = "/data/data/com.example.hun10.topik_test/";
     public static final String DATABASE_NAME="test.db";
 
     @Override
@@ -33,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         li = new Mylistner();
+        B1= (Button)findViewById(R.id.BT);
+        E1 = (EditText)findViewById(R.id.Search);
+        T1 = (TextView)findViewById(R.id.Result);
         initialize(getApplicationContext());
 
         B1.setOnClickListener(li);
@@ -42,7 +45,9 @@ public class MainActivity extends AppCompatActivity {
     {
         File folder = new File(PACKAGE_DIR + "databases");
         folder.mkdirs();
-        File outfile = new File(PACKAGE_DIR + "databases/"+DATABASE_NAME);
+        Log.i("aa",""+folder.exists());
+        File outfile = new File(PACKAGE_DIR + "databases/test.db");
+        Log.i("aa", PACKAGE_DIR + "databases/test.db");
 
         if(outfile.length()<=0)
         {
@@ -51,9 +56,16 @@ public class MainActivity extends AppCompatActivity {
                 InputStream is = assetManager.open(DATABASE_NAME,AssetManager.ACCESS_BUFFER);
                 long filesize = is.available();
                 byte [] tempdata = new byte[(int)filesize];
+                Log.i("aa", ""+filesize);
+
                 is.read(tempdata);
                 is.close();
+
+                Log.i("aa", ""+outfile.exists());
+
+                if(!outfile.exists())
                 outfile.createNewFile();
+
                 FileOutputStream fo = new FileOutputStream(outfile);
                 fo.write(tempdata);
                 fo.close();
@@ -66,18 +78,20 @@ public class MainActivity extends AppCompatActivity {
     class Mylistner implements View.OnClickListener {
         public void onClick(View v)
         {
+
             String str = E1.getText().toString();
             if(str==null)
                 Toast.makeText(getApplicationContext(),"키워드를 입력하세요.", Toast.LENGTH_SHORT).show();
             else {
                 try {
                     SQLiteDatabase db = openOrCreateDatabase("test.db", Context.MODE_PRIVATE, null);
-                    Cursor cur = db.rawQuery("SELECT Main FROM testdb where Name="+str, null);
+                    Cursor cur = db.rawQuery("SELECT Grade FROM testdb where \"Index\"=\"" + str + "\";", null);
+                    Log.i("topik", "" + cur.getCount());
                     cur.moveToFirst();
-                    Log.i("move!!!", "" + cur.getString(0));
+                    Log.i("topik", "" + cur.getString(0));
                     T1.setText(cur.getString(0));
                 } catch (Exception e) {
-                    Log.i("_)", "" + e.toString());
+                    Log.i("topik", "" + e.toString());
                 }
             }
         }
